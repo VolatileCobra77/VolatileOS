@@ -1,5 +1,5 @@
 nasm -f elf64 kernel/boot.asm -o build/boot.o
-g++ -ffreestanding -fno-exceptions -fno-rtti -nostdlib -Wall -Wextra -c kernel/kernel.cpp -o build/kernel.o
+g++ -ffreestanding -fno-exceptions -fno-rtti -fno-stack-protector -nostdlib -Wall -Wextra -O0 -c kernel/kernel.cpp -o build/kernel.o
 ld -T kernel/linker.ld build/kernel.o build/boot.o -o build/kernel.bin
 grub-file --is-x86-multiboot2 build/kernel.bin
 if [ $? == "1" ]

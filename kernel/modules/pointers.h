@@ -1,0 +1,1 @@
+#define TERMINAL_VGA 0xB8000

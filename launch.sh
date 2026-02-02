@@ -7,9 +7,6 @@ VNC_ADDR="127.0.0.1:5900"
 # Start QEMU in background
 qemu-system-x86_64 \
   -cdrom "$ISO" \
-  -no-reboot \
-  -vnc :0 \
-  -serial stdio \
   &
 
 QEMU_PID=$!
