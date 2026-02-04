@@ -3,9 +3,10 @@
 #include <stdbool.h>
 #include "./graphics/framebuffer.h"
 #include "./graphics/font.h"
-#include "./terminal/terminal.h"
 #include "./drivers/keyboard.h"
-
+#include "drivers/timers.h"
+#include "terminal/terminal.h"
+#include "./drivers/idt.h"
 
 // // Set the base revision to 4, this is recommended as this is the latest
 // // base revision described by the Limine boot protocol specification.
@@ -93,43 +94,24 @@ static void hcf(void) {
     }
 }
 
+extern void irq0_stub(void);
+
 // The following will be our kernel's entry point.
 // If renaming kmain() to something else, make sure to change the
 // linker script accordingly.
 void kernel_main(void) {
-//     // Ensure the bootloader actually understands our base revision (see spec).
-//     if (LIMINE_BASE_REVISION_SUPPORTED(limine_base_revision) == false) {
-//         hcf();
-//     }
+    //idt_init();
+    //idt_set_gate(32, pit_irq_handler);
 
-//     // Ensure we got a framebuffer.
-//     if (framebuffer_request.response == NULL
-//      || framebuffer_request.response->framebuffer_count < 1) {
-//         hcf();
-//     }
-
-//     // Fetch the first framebuffer.
-//     struct limine_framebuffer *framebuffer = framebuffer_request.response->framebuffers[0];
-
-// uint32_t width  = framebuffer->width;
-// uint32_t height = framebuffer->height;
-// uint32_t pitch  = framebuffer->pitch / 4; // bytes -> pixels
-
-// volatile uint32_t *fb_ptr = framebuffer->address;
-
-// for (uint32_t y = 0; y < height; y++) {
-//     for (uint32_t x = 0; x < width; x++) {
-//         fb_ptr[y * pitch + x] = 0x00ff00ff; // ARGB or XRGB color
-//     }
-// }
-
+    //timer_init();
+    asm volatile ("sti");
     framebuffer_init();
     clear_screen(COLOR_BLACK);
-    terminal_init(10);
-
-    term.putchar(&term, 'A', font_monospace, 10, COLOR_WHITE);
-
+    draw_string(10, 10, COLOR_WHITE, "Welcome to VolatileOS", font_monospace, 3);
+    //sleep_ms(1000);
+    scroll_screen(20);
 
     // We're done, just hang...
+    asm volatile ("cli");
     hcf();
 }
